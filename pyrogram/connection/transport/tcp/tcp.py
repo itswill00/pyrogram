@@ -37,7 +37,14 @@ class TCP:
         self.writer = None
 
         self.lock = asyncio.Lock()
-        self.loop = asyncio.get_event_loop()
+        try:
+            self.loop = asyncio.get_running_loop()
+        except RuntimeError:
+            try:
+                self.loop = asyncio.get_event_loop()
+            except RuntimeError:
+                self.loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(self.loop)
 
         self.proxy = proxy
 
@@ -79,7 +86,7 @@ class TCP:
                 await self.loop.run_in_executor(executor, self.socket.connect, address)
         else:
             try:
-                await asyncio.wait_for(asyncio.get_event_loop().sock_connect(self.socket, address), TCP.TIMEOUT)
+                await asyncio.wait_for(self.loop.sock_connect(self.socket, address), TCP.TIMEOUT)
             except asyncio.TimeoutError:  # Re-raise as TimeoutError. asyncio.TimeoutError is deprecated in 3.11
                 raise TimeoutError("Connection timed out")
 

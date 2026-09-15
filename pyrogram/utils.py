@@ -37,7 +37,11 @@ async def ainput(prompt: str = "", *, hide: bool = False):
     """Just like the built-in input, but async"""
     with ThreadPoolExecutor(1) as executor:
         func = functools.partial(getpass if hide else input, prompt)
-        return await asyncio.get_event_loop().run_in_executor(executor, func)
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(executor, func)
 
 
 def get_input_media_from_file_id(
@@ -198,11 +202,11 @@ def unpack_inline_message_id(inline_message_id: str) -> "raw.base.InputBotInline
         )
 
 
-MIN_CHANNEL_ID = -1002147483647
+MIN_CHANNEL_ID = -1000000000000000000
 MAX_CHANNEL_ID = -1000000000000
 MIN_CHAT_ID = -2147483647
 MAX_USER_ID_OLD = 2147483647
-MAX_USER_ID = 999999999999
+MAX_USER_ID = 1000000000000000000
 
 
 def get_raw_peer_id(peer: raw.base.Peer) -> Optional[int]:

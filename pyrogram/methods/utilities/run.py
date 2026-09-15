@@ -70,7 +70,16 @@ class Run:
 
                 app.run(main())
         """
-        loop = asyncio.get_event_loop()
+        loop = getattr(self, "loop", None)
+        if loop is None or loop.is_closed():
+            try:
+                loop = asyncio.get_running_loop()
+            except RuntimeError:
+                try:
+                    loop = asyncio.get_event_loop()
+                except RuntimeError:
+                    loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
         run = loop.run_until_complete
 
         if coroutine is not None:

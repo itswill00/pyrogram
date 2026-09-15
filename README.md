@@ -57,10 +57,19 @@ identity (bot API alternative) using Python.
 - **Async**: Fully asynchronous (also usable synchronously if wanted, for convenience).
 - **Powerful**: Full access to Telegram's API to execute any official client action and more.
 
+## Patches in this Fork
+
+This fork maintains compatibility for modern Telegram infrastructure and current Python versions:
+
+- **64-bit Telegram IDs**: Updated channel, supergroup, and user ID ranges (`MIN_CHANNEL_ID` and `MAX_USER_ID`) in `pyrogram.utils` to support channels created above `-1002000000000` without triggering `ValueError: Peer id invalid`.
+- **Python 3.12+ Event Loop Compatibility**: Updated event loop acquisition across `Client`, `Dispatcher`, `Session`, `TCP`, `sync`, and `download_media` to gracefully handle environments without an active running loop or where implicit event loop creation is deprecated.
+
 ### Installing
 
-``` bash
-pip3 install pyrogram
+Install directly from this repository:
+
+```bash
+pip3 install git+https://github.com/itswill00/pyrogram.git
 ```
 
 ### Resources

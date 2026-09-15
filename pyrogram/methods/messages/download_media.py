@@ -184,4 +184,10 @@ class DownloadMedia:
         if block:
             return await downloader
         else:
-            asyncio.get_event_loop().create_task(downloader)
+            loop = getattr(self, "loop", None)
+            if loop is None or loop.is_closed():
+                try:
+                    loop = asyncio.get_running_loop()
+                except RuntimeError:
+                    loop = asyncio.get_event_loop()
+            return loop.create_task(downloader)
